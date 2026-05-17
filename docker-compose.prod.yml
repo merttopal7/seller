@@ -1,0 +1,95 @@
+services:
+
+  # ── Elasticsearch ────────────────────────────────────────────────────────────
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: classified-es
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - classified-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health | grep -v '\"status\":\"red\"' || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
+
+  # ── Backend (Express + Prisma + Socket.IO) ───────────────────────────────────
+  backend:
+    build:
+      context: ./classified-backend
+      dockerfile: Dockerfile
+    container_name: classified-backend
+    env_file: .env.production
+    environment:
+      NODE_ENV: production
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      DATABASE_URL: file:/app/data/prod.db
+      BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
+    volumes:
+      - db_data:/app/data
+      - uploads_data:/app/uploads
+    networks:
+      - classified-net
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── Frontend (Next.js standalone) ────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./classified-marketplace
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-MarketPlace}
+    container_name: classified-frontend
+    env_file: .env.production
+    environment:
+      NODE_ENV: production
+      # Server-side fetches go directly to backend over the internal network
+      BACKEND_API_URL: http://backend:5000
+      DATABASE_URL: file:/app/data/prod.db
+    volumes:
+      - db_data:/app/data
+    networks:
+      - classified-net
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # ── Nginx (reverse proxy) ─────────────────────────────────────────────────────
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: classified-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - certbot_www:/var/www/certbot:ro
+      - certbot_conf:/etc/letsencrypt:ro
+    networks:
+      - classified-net
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+
+networks:
+  classified-net:
+    driver: bridge
+
+volumes:
+  esdata:
+  db_data:
+  uploads_data:
+  certbot_www:
+  certbot_conf:
