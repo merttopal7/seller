@@ -1,6 +1,6 @@
 # 🛒 Classified Marketplace
 
-Modern, full-stack ilan yönetim platformu. Türkiye odaklı, çok dilli lokasyon desteği ile geliştirilmiş gelişmiş sınıflı ilan sitesi.
+Modern, full-stack ilan yönetim platformu. Türkiye odaklı, 4 kademeli konum hiyerarşisi ve gerçek zamanlı mesajlaşma ile geliştirilmiş sınıflı ilan sitesi.
 
 ---
 
@@ -15,6 +15,7 @@ Modern, full-stack ilan yönetim platformu. Türkiye odaklı, çok dilli lokasyo
 - [Ortam Değişkenleri](#-ortam-değişkenleri)
 - [Production Deployment](#-production-deployment)
 - [Admin Paneli](#-admin-paneli)
+- [Komutlar Referansı](#-komutlar-referansı)
 
 ---
 
@@ -29,7 +30,7 @@ Modern, full-stack ilan yönetim platformu. Türkiye odaklı, çok dilli lokasyo
 - 🗺 Leaflet harita entegrasyonu — ilan konumunu haritadan seçme
 - ❤️ Favorilere ekleme / kaldırma
 - 💬 Gerçek zamanlı mesajlaşma (Socket.IO)
-- 📸 Sunucu taraflı görüntü sıkıştırma (Sharp → WebP)
+- 📸 Sunucu taraflı görüntü sıkıştırma (Sharp → WebP, max 1200×900)
 
 ### Admin Paneli
 - 👥 Kullanıcı yönetimi (listeleme, banlama, rol değiştirme)
@@ -52,7 +53,7 @@ Modern, full-stack ilan yönetim platformu. Türkiye odaklı, çok dilli lokasyo
 | SQLite (libSQL) | — | Veritabanı |
 | Elasticsearch | v8 | Tam metin arama |
 | Socket.IO | v4 | Gerçek zamanlı mesajlaşma |
-| Multer + Sharp | — | Görüntü yükleme & sıkıştırma |
+| Multer + Sharp | — | Görüntü yükleme & sıkıştırma (yerel depolama) |
 | bcryptjs | — | Şifre hashleme |
 | jsonwebtoken | — | JWT kimlik doğrulama |
 | Zod | v4 | Şema doğrulama |
@@ -60,7 +61,7 @@ Modern, full-stack ilan yönetim platformu. Türkiye odaklı, çok dilli lokasyo
 ### Frontend (`classified-marketplace`)
 | Paket | Versiyon | Amaç |
 |---|---|---|
-| Next.js | v16 | React framework (App Router) |
+| Next.js | v16 | React framework (App Router, standalone) |
 | React | v19 | UI kütüphanesi |
 | TypeScript | v5 | Tip güvenliği |
 | Tailwind CSS | v4 | Stil sistemi |
@@ -76,7 +77,6 @@ Modern, full-stack ilan yönetim platformu. Türkiye odaklı, çok dilli lokasyo
 |---|---|
 | Docker + Docker Compose | Konteynerleştirme |
 | Nginx | Reverse proxy, SSL terminasyonu |
-| Let's Encrypt (Certbot) | Ücretsiz SSL sertifikası |
 
 ---
 
@@ -104,10 +104,11 @@ Burkina/
 │   │       ├── messages.ts      # /api/messages
 │   │       ├── upload.ts        # /api/upload
 │   │       └── admin.ts         # /api/admin
-│   ├── uploads/                 # Yüklenen görseller (WebP)
+│   ├── uploads/                 # Yüklenen görseller (WebP, Docker volume)
+│   ├── entrypoint.sh            # DB migration + sunucu başlatma scripti
 │   └── Dockerfile
 │
-├── classified-marketplace/      # Next.js Frontend
+├── classified-marketplace/      # Next.js Frontend (standalone output)
 │   ├── src/
 │   │   ├── app/
 │   │   │   ├── page.tsx         # Ana sayfa
@@ -131,8 +132,7 @@ Burkina/
 │   │       └── validations.ts   # Zod şemaları
 │   └── Dockerfile
 │
-├── docker-compose.prod.yml      # Production compose
-├── nginx.conf                   # Nginx yapılandırması
+├── docker-compose.prod.yml      # Production compose (nginx hariç)
 ├── .env.production.example      # Ortam değişkenleri şablonu
 ├── .gitignore
 └── README.md
@@ -264,12 +264,12 @@ user_typing({ userId, name })
 user_stopped_typing({ userId })
 ```
 
-### Yükleme
+### Görüntü Yükleme
 ```
-POST   /api/upload             # Görüntü yükle ve WebP'ye dönüştür (auth)
-# Content-Type: multipart/form-data
-# Field: file (image/jpeg, image/png, image/webp, image/gif)
-# Max boyut: 5MB → Sharp ile 1200x900 WebP'ye sıkıştırılır
+POST   /api/upload             # Görüntü yükle (auth gerekli)
+# Content-Type: multipart/form-data, Field: file
+# Desteklenen: jpeg, jpg, png, webp, gif  |  Max: 5MB
+# Çıktı: 1200×900 WebP, /uploads/ dizinine kaydedilir
 ```
 
 ---
@@ -291,65 +291,53 @@ cd Burkina
 
 ```bash
 cd classified-backend
-
-# Bağımlılıkları yükle
 npm install
 
 # .env dosyası oluştur
-cp .env.example .env   # veya elle oluştur (aşağıya bakın)
-
-# Veritabanı şeması uygula
-npm run db:push
-
-# Örnek verileri yükle
-npm run db:seed
-
-# Geliştirme sunucusunu başlat
-npm run dev
-# → http://localhost:5000
+cp .env.example .env
 ```
 
-**`classified-backend/.env` örneği:**
+**`classified-backend/.env`:**
 ```env
 DATABASE_URL=file:./dev.db
-JWT_SECRET=gizli-anahtar-buraya
+JWT_SECRET=gizli-anahtar-min-32-karakter
 PORT=5000
 BACKEND_URL=http://localhost:5000
+```
+
+```bash
+npx prisma db push   # Tabloları oluştur
+npm run db:seed      # Örnek veri yükle
+npm run dev          # → http://localhost:5000
 ```
 
 ### 3. Frontend Kurulumu
 
 ```bash
 cd classified-marketplace
-
-# Bağımlılıkları yükle
 npm install
-
-# .env dosyası oluştur
-cp .env.example .env.local   # veya elle oluştur
-
-# Geliştirme sunucusunu başlat
-npm run dev
-# → http://localhost:3000
 ```
 
-**`classified-marketplace/.env.local` örneği:**
+**`classified-marketplace/.env.local`:**
 ```env
 BACKEND_API_URL=http://localhost:5000
 NEXT_PUBLIC_BACKEND_URL=http://localhost:5000
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 NEXT_PUBLIC_APP_NAME=MarketPlace
-JWT_SECRET=gizli-anahtar-buraya
+JWT_SECRET=gizli-anahtar-min-32-karakter
 ```
 
 > ⚠️ `JWT_SECRET` backend ve frontend'de **aynı** olmalıdır.
 
+```bash
+npm run dev   # → http://localhost:3000
+```
+
 ### 4. Elasticsearch (Opsiyonel)
 
-Elasticsearch olmadan uygulama Prisma fallback ile çalışır, ancak tam metin arama sınırlı olur.
+Elasticsearch olmadan uygulama Prisma fallback ile çalışır.
 
 ```bash
-# Docker ile Elasticsearch başlat
 docker run -d \
   --name es-local \
   -p 9200:9200 \
@@ -369,74 +357,141 @@ docker run -d \
 | `DATABASE_URL` | ✅ | SQLite yolu (`file:./dev.db`) |
 | `JWT_SECRET` | ✅ | JWT imzalama anahtarı (min 32 karakter) |
 | `PORT` | ❌ | Sunucu portu (varsayılan: `5000`) |
-| `BACKEND_URL` | ❌ | Yüklenen görsel URL'leri için public domain |
+| `BACKEND_URL` | ❌ | Yüklenen görsel URL'leri için **public** domain |
 | `ELASTICSEARCH_URL` | ❌ | ES bağlantı URL'i (varsayılan: `http://localhost:9200`) |
 
 ### Frontend
 
 | Değişken | Zorunlu | Açıklama |
 |---|---|---|
-| `BACKEND_API_URL` | ✅ | Server-side backend URL (Docker'da internal) |
-| `NEXT_PUBLIC_BACKEND_URL` | ✅ | Client-side backend URL (public domain) |
+| `BACKEND_API_URL` | ✅ | Server-side backend URL (Docker içinde internal adres) |
+| `NEXT_PUBLIC_BACKEND_URL` | ✅ | Client-side backend URL (tarayıcıdan erişilen public domain) |
 | `NEXT_PUBLIC_APP_URL` | ✅ | Uygulamanın public URL'i |
 | `NEXT_PUBLIC_APP_NAME` | ❌ | Site adı (varsayılan: `MarketPlace`) |
-| `JWT_SECRET` | ✅ | Backend ile aynı JWT anahtarı |
+| `JWT_SECRET` | ✅ | Backend ile **aynı** JWT anahtarı |
 
 ---
 
 ## 🐳 Production Deployment
 
-### Hızlı Başlangıç
+Bu proje harici bir nginx reverse proxy arkasında çalışacak şekilde yapılandırılmıştır.
+Docker Compose dosyasında nginx servisi **yoktur** — kendi nginx'inizi kullanın.
 
-```bash
-# 1. Env dosyası oluştur
-cp .env.production.example .env.production
-nano .env.production   # Değerleri doldur
+### Port Atamaları (önerilen)
 
-# 2. Tüm servisleri build et ve başlat
-docker compose -f docker-compose.prod.yml up -d --build
-
-# 3. Veritabanını tohumla (ilk çalıştırmada)
-docker exec classified-backend node dist/index.js --seed
-# veya
-docker exec -it classified-backend sh -c "node --import tsx prisma/seed.ts"
-```
-
-### Servisler
-
-| Servis | Port | Açıklama |
+| Servis | Host Port | Container Port |
 |---|---|---|
-| `nginx` | 80, 443 | Reverse proxy & SSL |
-| `frontend` | 3000 (internal) | Next.js standalone |
-| `backend` | 5000 (internal) | Express.js API |
-| `elasticsearch` | 9200 (internal) | Tam metin arama |
+| Backend (Express) | `127.0.0.1:5155` | `5000` |
+| Frontend (Next.js) | `127.0.0.1:3155` | `3000` |
+| Elasticsearch | internal only | `9200` |
 
-### SSL Sertifikası (Let's Encrypt)
+### 1. Env Dosyasını Oluştur
 
 ```bash
-# Certbot ile sertifika al
-docker run --rm \
-  -v certbot_conf:/etc/letsencrypt \
-  -v certbot_www:/var/www/certbot \
-  certbot/certbot certonly \
-  --webroot -w /var/www/certbot \
-  -d yourdomain.com \
-  --email your@email.com \
-  --agree-tos
-
-# nginx.conf içindeki HTTPS bloğunu etkinleştir
-# (yourdomain.com ile değiştirip `#` işaretlerini kaldır)
-
-# Nginx'i yeniden başlat
-docker compose -f docker-compose.prod.yml restart nginx
+cp .env.production.example .env.production
+nano .env.production
 ```
 
-### Yüklenen Görseller
+```env
+JWT_SECRET=<openssl rand -base64 48 ile üret>
+NEXTAUTH_SECRET=<openssl rand -base64 48 ile üret>
 
-Görseller backend konteynerinde `/app/uploads/` dizinine kaydedilir ve `uploads_data` Docker volume'u ile kalıcı olarak saklanır. Nginx bu klasörü `/uploads/` path'i üzerinden serve eder.
+NEXT_PUBLIC_APP_URL=https://market.temirshield.com
+NEXTAUTH_URL=https://market.temirshield.com
+NEXT_PUBLIC_BACKEND_URL=https://market.temirshield.com
+
+NEXT_PUBLIC_APP_NAME=Market
+```
+
+> **`NEXT_PUBLIC_BACKEND_URL` neden domain?**
+> Backend `5155` portunda, frontend `3155` portunda çalışır.
+> Nginx her iki portu da tek domain altında toplar.
+> Tarayıcı `/api/...` isteği atarken domain üzerinden gider, nginx backend'e yönlendirir.
+
+### 2. Servisleri Build Et ve Başlat
 
 ```bash
-# Görselleri yedekle
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+Container başladığında `entrypoint.sh` otomatik olarak `prisma db push` çalıştırır —
+**tablolar otomatik oluşturulur**, elle müdahale gerekmez.
+
+### 3. Seed'i Bir Kere Çalıştır (İlk Kurulumda)
+
+```bash
+docker exec -it classified-backend npx prisma db seed
+```
+
+> ⚠️ `docker exec classified-backend node dist/index.js --seed` **yanlış** komuttur —
+> sunucuyu yeniden başlatmaya çalışır ve port çakışması verir. Doğrusu `npx prisma db seed`.
+
+### 4. Nginx Yapılandırması
+
+Nginx config dosyanıza aşağıdaki server bloğunu ekleyin:
+
+```nginx
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name market.temirshield.com;
+    client_max_body_size 50M;
+
+    ssl_certificate     /etc/nginx/certs/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/privkey.pem;
+
+    # Yüklenen görseller → Backend
+    location /uploads/ {
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_pass http://host.docker.internal:5155;
+    }
+
+    # REST API → Backend
+    location /api/ {
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_read_timeout 60s;
+        proxy_pass http://host.docker.internal:5155;
+    }
+
+    # Socket.IO → Backend (WebSocket zorunlu)
+    location /socket.io/ {
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade    $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_read_timeout 86400s;
+        proxy_pass http://host.docker.internal:5155;
+    }
+
+    # Her şey → Next.js Frontend
+    location / {
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade    $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_read_timeout 3600s;
+        proxy_pass http://host.docker.internal:3155;
+    }
+}
+```
+
+```bash
+nginx -t && nginx -s reload
+```
+
+### Görsel Yedekleme
+
+```bash
+# Tüm görselleri yedekle
 docker cp classified-backend:/app/uploads ./uploads-backup
 
 # Volume boyutunu kontrol et
@@ -447,15 +502,15 @@ docker system df -v | grep uploads_data
 
 ## 🎛 Admin Paneli
 
-Admin paneline erişim: `https://yourdomain.com/admin`
+Admin paneline erişim: `https://market.temirshield.com/admin`
 
 Seed verisi ile oluşturulan admin hesabı:
 - **E-posta:** `yonetici@ornek.com`
 - **Şifre:** `sifre123`
 
-> ⚠️ Production'da bu bilgileri `prisma/seed.ts`'de değiştirin!
+> ⚠️ **Production'dan önce** bu bilgileri `prisma/seed.ts`'de değiştirin!
 
-### Admin Özellikleri
+### Admin Sayfaları
 
 | Sayfa | URL | Açıklama |
 |---|---|---|
@@ -473,8 +528,8 @@ Seed verisi ile oluşturulan admin hesabı:
 ```bash
 npm run dev          # Geliştirme sunucusu (nodemon + tsx)
 npm run build        # TypeScript derle → dist/
-npm start            # Production sunucusu
-npm run db:push      # Şemayı DB'ye uygula
+npm start            # Production sunucusu (entrypoint.sh kullanın)
+npm run db:push      # Şemayı DB'ye uygula (tablo oluştur/güncelle)
 npm run db:seed      # Örnek veri yükle
 npx prisma studio    # Prisma veritabanı GUI
 ```
@@ -482,9 +537,31 @@ npx prisma studio    # Prisma veritabanı GUI
 ### Frontend
 ```bash
 npm run dev          # Geliştirme sunucusu
-npm run build        # Production build
+npm run build        # Production build (standalone)
 npm start            # Production sunucusu
 npm run lint         # ESLint
+```
+
+### Docker
+```bash
+# Tüm servisleri başlat
+docker compose -f docker-compose.prod.yml up -d --build
+
+# Sadece backend'i yeniden build et
+docker compose -f docker-compose.prod.yml up -d --build backend
+
+# Logları izle
+docker logs classified-backend -f
+docker logs classified-frontend -f
+
+# Seed çalıştır (ilk kurulumda)
+docker exec -it classified-backend npx prisma db seed
+
+# Container'a gir
+docker exec -it classified-backend sh
+
+# Tüm servisleri durdur
+docker compose -f docker-compose.prod.yml down
 ```
 
 ---
