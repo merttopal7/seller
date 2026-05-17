@@ -2,6 +2,9 @@
 FROM node:20-slim AS builder
 WORKDIR /app
 
+# Install OpenSSL for Prisma
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 COPY package*.json ./
 COPY prisma ./prisma/
 RUN npm ci
@@ -16,12 +19,14 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
+# Install OpenSSL for Prisma
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 COPY package*.json ./
 COPY prisma ./prisma/
 
 # Install prod deps + keep prisma CLI + tsx for seeding
 RUN npm ci --omit=dev && \
-    npm install prisma tsx --no-save --prefer-offline 2>/dev/null || \
     npm install prisma tsx --no-save
 
 # Copy generated Prisma client (platform-native binary from build stage)
