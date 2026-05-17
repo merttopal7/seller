@@ -21,6 +21,8 @@ services:
 
   # ── Backend (Express + Prisma + Socket.IO) ───────────────────────────────────
   backend:
+    ports:
+      - "127.0.0.1:5155:5000"
     build:
       context: ./classified-backend
       dockerfile: Dockerfile
@@ -43,6 +45,8 @@ services:
 
   # ── Frontend (Next.js standalone) ────────────────────────────────────────────
   frontend:
+    ports:
+      - "127.0.0.1:3155:3000"
     build:
       context: ./classified-marketplace
       dockerfile: Dockerfile
