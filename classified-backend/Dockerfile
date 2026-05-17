@@ -27,9 +27,8 @@ COPY package*.json ./
 COPY prisma.config.ts ./
 COPY prisma ./prisma/
 
-# Install prod deps + keep prisma CLI + tsx for seeding
-RUN npm ci --omit=dev && \
-    npm install prisma tsx --no-save
+# Install prod deps (tsx and prisma are now in dependencies)
+RUN npm ci --omit=dev
 
 # Copy generated Prisma client (platform-native binary from build stage)
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
