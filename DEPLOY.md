@@ -67,8 +67,10 @@ Open `nginx.conf` and replace every occurrence of `yourdomain.com` with your act
 ## 4. First Build & Start
 
 ```bash
-docker compose -f docker-compose.prod.yml up -d --build
+docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build
 ```
+
+> **Important:** `--env-file .env.production` is required so Docker Compose can resolve `${NEXT_PUBLIC_*}` build arguments at image build time. Without it, those variables arrive empty and the frontend falls back to `localhost:5000`.
 
 This will:
 1. Build the backend image (TypeScript → JS)
@@ -79,7 +81,7 @@ This will:
 
 Watch logs during first boot:
 ```bash
-docker compose -f docker-compose.prod.yml logs -f backend
+docker compose --env-file .env.production -f docker-compose.prod.yml logs -f backend
 ```
 
 Expected output when ready:
@@ -96,10 +98,10 @@ The SQLite database is created automatically on first run. If you need to apply 
 
 ```bash
 # Run migrations (if you use migrate instead of db push)
-docker compose -f docker-compose.prod.yml exec backend npx prisma migrate deploy
+docker compose --env-file .env.production -f docker-compose.prod.yml exec backend npx prisma migrate deploy
 
 # Seed initial data (optional)
-docker compose -f docker-compose.prod.yml exec backend npx prisma db seed
+docker compose --env-file .env.production -f docker-compose.prod.yml exec backend npx prisma db seed
 ```
 
 ---
@@ -107,7 +109,7 @@ docker compose -f docker-compose.prod.yml exec backend npx prisma db seed
 ## 6. Verify Everything Is Running
 
 ```bash
-docker compose -f docker-compose.prod.yml ps
+docker compose --env-file .env.production -f docker-compose.prod.yml ps
 ```
 
 All four services should show `Up` / `healthy`:
@@ -153,7 +155,7 @@ sudo certbot certonly --webroot \
 3. In the HTTP `server` block, replace `include /etc/nginx/conf.d/proxy.conf;` with `return 301 https://$host$request_uri;`
 
 ```bash
-docker compose -f docker-compose.prod.yml restart nginx
+docker compose --env-file .env.production -f docker-compose.prod.yml restart nginx
 ```
 
 ### 7.4 Auto-Renew
@@ -170,27 +172,27 @@ sudo crontab -e
 
 ### Logs
 ```bash
-docker compose -f docker-compose.prod.yml logs -f             # all services
-docker compose -f docker-compose.prod.yml logs -f backend     # backend only
-docker compose -f docker-compose.prod.yml logs -f frontend    # frontend only
+docker compose --env-file .env.production -f docker-compose.prod.yml logs -f             # all services
+docker compose --env-file .env.production -f docker-compose.prod.yml logs -f backend     # backend only
+docker compose --env-file .env.production -f docker-compose.prod.yml logs -f frontend    # frontend only
 ```
 
 ### Restart a service
 ```bash
-docker compose -f docker-compose.prod.yml restart backend
+docker compose --env-file .env.production -f docker-compose.prod.yml restart backend
 ```
 
 ### Stop / Start
 ```bash
-docker compose -f docker-compose.prod.yml down      # stop (volumes preserved)
-docker compose -f docker-compose.prod.yml up -d     # start again
+docker compose --env-file .env.production -f docker-compose.prod.yml down      # stop (volumes preserved)
+docker compose --env-file .env.production -f docker-compose.prod.yml up -d     # start again
 ```
 
 ### Rebuild after code changes
 ```bash
-docker compose -f docker-compose.prod.yml up -d --build backend    # rebuild backend only
-docker compose -f docker-compose.prod.yml up -d --build frontend   # rebuild frontend only
-docker compose -f docker-compose.prod.yml up -d --build            # rebuild everything
+docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build backend    # rebuild backend only
+docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build frontend   # rebuild frontend only
+docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build            # rebuild everything
 ```
 
 ### Re-index Elasticsearch
@@ -201,7 +203,7 @@ curl -X POST http://localhost/api/admin/reindex \
 
 Or from within the server (bypasses nginx):
 ```bash
-docker compose -f docker-compose.prod.yml exec backend \
+docker compose --env-file .env.production -f docker-compose.prod.yml exec backend \
   node -e "import('./dist/lib/search-service.js').then(m => m.reindexAll().then(n => console.log('indexed', n)))"
 ```
 
@@ -216,8 +218,8 @@ docker run --rm \
 
 ### Open a shell inside a container
 ```bash
-docker compose -f docker-compose.prod.yml exec backend sh
-docker compose -f docker-compose.prod.yml exec frontend sh
+docker compose --env-file .env.production -f docker-compose.prod.yml exec backend sh
+docker compose --env-file .env.production -f docker-compose.prod.yml exec frontend sh
 ```
 
 ---
@@ -278,7 +280,7 @@ Elasticsearch takes ~30 seconds to become healthy. The backend will print a warn
 ### "Cannot find module" in backend
 The TypeScript build failed. Check:
 ```bash
-docker compose -f docker-compose.prod.yml logs backend | head -50
+docker compose --env-file .env.production -f docker-compose.prod.yml logs backend | head -50
 ```
 
 ### Next.js build fails
