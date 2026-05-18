@@ -468,10 +468,8 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
           {/* Top Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
             <div>
-              <p className="text-sm text-muted-foreground">
-                {total === 0
-                  ? "0 ads found"
-                  : `${((page - 1) * limit + 1).toLocaleString()}–${Math.min(page * limit, total).toLocaleString()} of ${total.toLocaleString()} ads`}
+              <p className="text-sm font-medium text-muted-foreground">
+                {total === 1 ? "1 ad found" : `${total.toLocaleString()} ads found`}
               </p>
             </div>
 
@@ -519,14 +517,21 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
 
           {/* Pagination + Limit */}
           {(totalPages > 1 || total > 0) && (
-            <div className="flex items-center justify-between gap-4 mt-8">
-              <LimitSelect
-                current={limit}
-                options={[10, 25, 50, 100].map((n) => ({
-                  value: n,
-                  href: buildUrl({ limit: String(n), page: "1" }),
-                }))}
-              />
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-4 border-t border-border/40">
+              <div className="flex items-center gap-3">
+                <LimitSelect
+                  current={limit}
+                  options={[10, 25, 50, 100].map((n) => ({
+                    value: n,
+                    href: buildUrl({ limit: String(n), page: "1" }),
+                  }))}
+                />
+                <span className="text-xs text-muted-foreground font-medium">
+                  {total === 0
+                    ? "0 ads found"
+                    : `${((page - 1) * limit + 1).toLocaleString()}–${Math.min(page * limit, total).toLocaleString()} of ${total.toLocaleString()} ads`}
+                </span>
+              </div>
 
               {totalPages > 1 && (
                 <div className="flex items-center gap-2">
