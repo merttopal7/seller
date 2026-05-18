@@ -147,7 +147,11 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
           </div>
 
           {/* Main image area */}
-          <div className="flex-1 relative flex items-center justify-center min-h-0 px-12" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="flex-1 relative flex items-center justify-center min-h-0 px-12"
+            style={{ paddingBottom: images.length === 1 ? "env(safe-area-inset-bottom)" : undefined }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="relative w-full h-full">
               <Image
                 src={fallback(current)}
@@ -180,7 +184,7 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
 
           {/* Thumbnail strip */}
           {images.length > 1 && (
-            <div className="shrink-0 px-4 py-3 flex gap-2 justify-center overflow-x-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="shrink-0 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex gap-2 justify-center overflow-x-auto" onClick={(e) => e.stopPropagation()}>
               {images.map((img, idx) => (
                 <button
                   key={img.id}
