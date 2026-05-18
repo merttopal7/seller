@@ -16,7 +16,7 @@ import {
   Plus, Pencil, Trash2, Search, X, ChevronLeft, ChevronRight,
   Car, Bike, Truck, Home, Key, Tag, Briefcase, Smartphone, Monitor,
   Headphones, Shirt, Footprints, Sparkles, Sofa, Refrigerator, Lamp,
-  Tree, Newspaper, Wrench, Lightbulb, Dumbbell, Book, Star, Layout, Map,
+  Trees, Newspaper, Wrench, Lightbulb, Dumbbell, Book, Star, Layout, Map,
   type LucideIcon,
 } from "lucide-react";
 
@@ -25,7 +25,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   briefcase: Briefcase, smartphone: Smartphone, monitor: Monitor,
   headphones: Headphones, shirt: Shirt, footprints: Footprints,
   sparkles: Sparkles, sofa: Sofa, refrigerator: Refrigerator,
-  lamp: Lamp, tree: Tree, newspaper: Newspaper, wrench: Wrench,
+  lamp: Lamp, tree: Trees, newspaper: Newspaper, wrench: Wrench,
   lightbulb: Lightbulb, dumbbell: Dumbbell, book: Book, star: Star,
   layout: Layout, map: Map,
 };
