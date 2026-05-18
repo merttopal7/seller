@@ -204,7 +204,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row gap-1">
         {/* Sidebar Filters */}
         <aside className="lg:w-64 shrink-0 lg:self-start lg:sticky lg:top-20">
           {/* spacer for the fixed mobile filter bar */}
@@ -467,11 +467,6 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
         <div className="flex-1 min-w-0">
           {/* Top Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                {total === 1 ? "1 ad found" : `${total.toLocaleString()} ads found`}
-              </p>
-            </div>
 
             {/* Sort — hidden on mobile (handled by the fixed filter bar) */}
             <div className="hidden md:flex items-center gap-2">
@@ -482,7 +477,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
 
           {/* Active Filters */}
           {activeFilters.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-2 mb-4 items-center">
               {activeFilters.map((f) => (
                 <Badge key={f.key} variant="secondary" className="gap-1.5 py-1">
                   {f.label}
