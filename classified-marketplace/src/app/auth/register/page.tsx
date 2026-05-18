@@ -49,7 +49,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-blue-600 items-center justify-center mb-4">
+          <div className="inline-flex h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-rose-600 items-center justify-center mb-4">
             <span className="text-white font-bold text-xl">M</span>
           </div>
           <h1 className="text-2xl font-bold">Create an account</h1>

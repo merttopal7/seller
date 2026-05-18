@@ -54,14 +54,19 @@ export function AdListItem({
 
   return (
     <Link href={`/ads/${ad.id}`} className="group block">
-      <div className="flex gap-3 rounded-xl border border-border bg-card overflow-hidden hover:shadow-md transition-all duration-200 hover:border-primary/30 p-3">
+      <div className={cn(
+        "flex gap-3 rounded-xl border bg-card overflow-hidden hover:shadow-md transition-all duration-200 p-3",
+        ad.isFeatured
+          ? "border-amber-500/30 dark:border-amber-500/40 hover:border-primary/40 shadow-[0_0_15px_-3px_rgba(245,158,11,0.03)] dark:shadow-[0_0_20px_-3px_rgba(245,158,11,0.08)]"
+          : "border-border hover:border-primary/30"
+      )}>
         {/* Thumbnail */}
         <div className="relative shrink-0 w-28 h-20 sm:w-36 sm:h-24 rounded-lg overflow-hidden bg-muted">
           <Image
             src={imageUrl}
             alt={ad.title}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            className="object-contain group-hover:scale-105 transition-transform duration-500"
             onError={() => setImgError(true)}
             sizes="(max-width: 640px) 112px, 144px"
           />

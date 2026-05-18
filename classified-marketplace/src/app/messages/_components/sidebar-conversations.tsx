@@ -54,7 +54,7 @@ export function SidebarConversations({
                 )}
               >
                 <div className="relative shrink-0">
-                  <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                  <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-rose-600 flex items-center justify-center text-white font-bold text-sm">
                     {other?.name?.charAt(0)?.toUpperCase() ?? "?"}
                   </div>
                   {conv.unreadCount > 0 && (

@@ -61,7 +61,7 @@ export default async function MessagesPage() {
                     className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/60 transition-colors group"
                   >
                     <div className="relative shrink-0">
-                      <div className="h-11 w-11 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                      <div className="h-11 w-11 rounded-full bg-gradient-to-br from-primary to-rose-600 flex items-center justify-center text-white font-bold text-sm">
                         {other?.name?.charAt(0)?.toUpperCase() ?? "?"}
                       </div>
                       {conv.unreadCount > 0 && (

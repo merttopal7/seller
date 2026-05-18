@@ -160,7 +160,7 @@ export function ChatWindow({
               className={cn("flex gap-2", isMe ? "justify-end" : "justify-start")}
             >
               {!isMe && (
-                <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-1">
+                <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary to-rose-600 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-1">
                   {msg.sender.name.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -189,7 +189,7 @@ export function ChatWindow({
         {/* Typing indicator */}
         {typingUser && (
           <div className="flex gap-2 items-center">
-            <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+            <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary to-rose-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
               {typingUser.charAt(0).toUpperCase()}
             </div>
             <div className="bg-muted rounded-2xl rounded-bl-sm px-4 py-2">

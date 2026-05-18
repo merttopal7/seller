@@ -107,6 +107,10 @@ export function CreateAdForm({ categories }: { categories: CategoryOption[] }) {
     resolver: zodResolver(adSchema) as any,
     defaultValues: {
       currency: "USD",
+      country: "",
+      state: "",
+      city: "",
+      location: "",
     },
   });
 
@@ -156,7 +160,7 @@ export function CreateAdForm({ categories }: { categories: CategoryOption[] }) {
   };
 
   return (
-    <div className="space-y-8 bg-card border border-border p-6 rounded-2xl shadow-sm">
+    <div className="space-y-8 bg-card border border-border p-4 sm:p-6 rounded-2xl shadow-sm">
       {/* Step Progress Indicator */}
       <div className="flex items-center justify-between mb-8 select-none">
         {[
@@ -683,20 +687,7 @@ export function CreateAdForm({ categories }: { categories: CategoryOption[] }) {
             </div>
           </div>
 
-          {/* Map Location */}
-          <div className="space-y-1.5 z-0">
-            <Label className="flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> Pin Exact Location (Optional)</Label>
-            <p className="text-xs text-muted-foreground mb-2">Click on the map to set the precise location. If you don't pick one, the center of the selected neighborhood will be used.</p>
-            <MapPicker 
-              center={mapCenter} 
-              selectedLocation={selectedMapCoords}
-              onLocationSelect={(lat, lng) => {
-                setSelectedMapCoords([lat, lng]);
-                setValue("latitude", lat, { shouldValidate: true });
-                setValue("longitude", lng, { shouldValidate: true });
-              }} 
-            />
-          </div>
+
 
           {/* Description */}
           <div className="space-y-1.5">
@@ -715,17 +706,19 @@ export function CreateAdForm({ categories }: { categories: CategoryOption[] }) {
             )}
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Button type="button" variant="outline" onClick={() => setStep(1)} className="flex-1">
               ◀ Back to Categories
             </Button>
             <Button type="submit" className="flex-1 gap-2 font-bold" variant="gradient" disabled={isDraftSaving}>
               {isDraftSaving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Saving Draft...
+                </>
               ) : (
                 "Next: Upload Images ➔"
               )}
-              {isDraftSaving ? "Saving Draft Listing..." : "Next: Upload Images ➔"}
             </Button>
           </div>
         </form>
@@ -815,13 +808,17 @@ export function CreateAdForm({ categories }: { categories: CategoryOption[] }) {
                   <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden border bg-background shadow-xs">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={img} alt="Preview" className="object-cover h-full w-full transition-transform duration-300 group-hover:scale-105" />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveImage(idx)}
-                      className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
-                    >
-                      <Trash className="h-5 w-5 text-white hover:text-red-400 transition-colors" />
-                    </button>
+                    {/* Hover Overlay with Delete Button */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none group-hover:pointer-events-auto">
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(idx)}
+                        className="p-3 bg-red-600 hover:bg-red-700 text-white rounded-full transition-all duration-200 hover:scale-110 active:scale-95 shadow-md flex items-center justify-center cursor-pointer"
+                        title="Remove image"
+                      >
+                        <Trash className="h-5 w-5" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -831,7 +828,7 @@ export function CreateAdForm({ categories }: { categories: CategoryOption[] }) {
             </p>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Button
               type="button"
               variant="outline"
@@ -867,11 +864,13 @@ export function CreateAdForm({ categories }: { categories: CategoryOption[] }) {
               }}
             >
               {isDraftSaving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Saving Images...
+                </>
               ) : (
                 "Next: Last Check ➔"
               )}
-              {isDraftSaving ? "Saving Images..." : "Next: Last Check ➔"}
             </Button>
           </div>
         </div>
@@ -960,7 +959,7 @@ export function CreateAdForm({ categories }: { categories: CategoryOption[] }) {
             )}
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Button
               type="button"
               variant="outline"
@@ -996,11 +995,13 @@ export function CreateAdForm({ categories }: { categories: CategoryOption[] }) {
               disabled={isDraftSaving}
             >
               {isDraftSaving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Publishing...
+                </>
               ) : (
                 "Publish Listing 🚀"
               )}
-              {isDraftSaving ? "Publishing..." : "Publish Listing 🚀"}
             </Button>
           </div>
         </div>

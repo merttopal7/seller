@@ -17,7 +17,7 @@ export const adSchema = z.object({
   description: z
     .string()
     .min(20, "Description must be at least 20 characters")
-    .max(5000),
+    .max(10000),
   price: z.number().min(0, "Price must be positive"),
   currency: z.string().default("USD"),
   location: z.string().min(3, "Location is required"),

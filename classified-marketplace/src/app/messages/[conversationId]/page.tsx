@@ -61,7 +61,7 @@ export default async function ConversationPage({ params }: Props) {
           <ArrowLeft className="h-5 w-5" />
         </Link>
 
-        <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
+        <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-rose-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
           {otherUser.name.charAt(0).toUpperCase()}
         </div>
 

@@ -62,10 +62,13 @@ router.get("/ads", async (req, res) => {
   try {
     const page = Math.max(1, Number(req.query.page) || 1);
     const status = (req.query.status as string) || "";
-    const limit = 20;
+    const search = ((req.query.search as string) || "").trim();
+    const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
     const skip = (page - 1) * limit;
 
-    const where = status ? { status: status as any } : {};
+    const where: any = {};
+    if (status) where.status = status;
+    if (search) where.title = { contains: search };
 
     const [ads, total] = await Promise.all([
       prisma.ad.findMany({
@@ -140,7 +143,7 @@ router.delete("/ads/:id", async (req, res) => {
 router.get("/users", async (req, res) => {
   try {
     const page = Math.max(1, Number(req.query.page) || 1);
-    const limit = 20;
+    const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
     const skip = (page - 1) * limit;
 
     const [users, total] = await Promise.all([

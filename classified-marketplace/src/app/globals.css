@@ -33,8 +33,8 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 24.6 95% 53.1%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
@@ -45,7 +45,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --ring: 24.6 95% 53.1%;
     --radius: 0.5rem;
   }
 
@@ -56,7 +56,7 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
+    --primary: 24.6 95% 60%;
     --primary-foreground: 222.2 47.4% 11.2%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -68,7 +68,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --ring: 24.6 95% 60%;
   }
 }
 
@@ -203,4 +203,44 @@
   float: left;
   height: 0;
   pointer-events: none;
+}
+
+/* ── Tiptap Custom Media & Table Styling ─────────────── */
+.rich-editor-content table,
+.rich-text-render table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.875rem;
+}
+
+.rich-editor-content th,
+.rich-text-render th {
+  background-color: hsl(var(--muted)/0.5);
+  font-weight: 600;
+  border: 1px solid hsl(var(--border));
+  padding: 0.625rem 0.75rem;
+  text-align: left;
+}
+
+.rich-editor-content td,
+.rich-text-render td {
+  border: 1px solid hsl(var(--border));
+  padding: 0.625rem 0.75rem;
+  vertical-align: middle;
+}
+
+.rich-editor-content tr:nth-child(even),
+.rich-text-render tr:nth-child(even) {
+  background-color: hsl(var(--muted)/0.15);
+}
+
+.rich-editor-content img,
+.rich-text-render img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
 }

@@ -57,7 +57,7 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
             src={fallback(current)}
             alt={`${title} - image ${current + 1}`}
             fill
-            className="object-cover"
+            className="object-contain"
             priority
             onError={() => setImgErrors((e) => ({ ...e, [current]: true }))}
             sizes="(max-width: 768px) 100vw, 60vw"
@@ -129,7 +129,8 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
       {/* Lightbox */}
       {lightbox && (
         <div
-          className="fixed inset-0 z-50 bg-black/95 flex flex-col"
+          className="fixed inset-0 z-50 bg-black/80 flex flex-col"
+          style={{ marginBottom: 0 }}
           onClick={() => setLightbox(false)}
         >
           {/* Top bar */}
@@ -149,7 +150,6 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
           {/* Main image area */}
           <div
             className="flex-1 relative flex items-center justify-center min-h-0 px-12"
-            style={{ paddingBottom: images.length === 1 ? "env(safe-area-inset-bottom)" : undefined }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="relative w-full h-full">
@@ -184,7 +184,7 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
 
           {/* Thumbnail strip */}
           {images.length > 1 && (
-            <div className="shrink-0 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex gap-2 justify-center overflow-x-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="shrink-0 px-4 py-3 flex gap-2 justify-center overflow-x-auto" onClick={(e) => e.stopPropagation()}>
               {images.map((img, idx) => (
                 <button
                   key={img.id}
@@ -204,6 +204,9 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
               ))}
             </div>
           )}
+
+          {/* Safe-area bottom spacer — fills home indicator zone on iOS/Android */}
+          <div className="shrink-0" style={{ height: "env(safe-area-inset-bottom)" }} onClick={(e) => e.stopPropagation()} />
         </div>
       )}
     </>

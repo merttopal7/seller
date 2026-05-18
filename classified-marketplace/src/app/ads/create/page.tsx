@@ -23,9 +23,7 @@ const BACKEND_URL = process.env.BACKEND_API_URL || "http://localhost:5000";
         </p>
       </div>
 
-      <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-        <CreateAdForm categories={categories} />
-      </div>
+      <CreateAdForm categories={categories} />
     </div>
   );
 }

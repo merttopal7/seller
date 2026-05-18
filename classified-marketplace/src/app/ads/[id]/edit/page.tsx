@@ -15,9 +15,10 @@ export default async function EditAdPage({ params }: EditAdPageProps) {
 
 const BACKEND_URL = process.env.BACKEND_API_URL || "http://localhost:5000";
 
-  const [adRes, categoriesRes] = await Promise.all([
+  const [adRes, categoriesRes, locationsRes] = await Promise.all([
     fetch(`${BACKEND_URL}/api/ads/${id}`, { cache: "no-store" }),
     fetch(`${BACKEND_URL}/api/categories`, { cache: "no-store" }),
+    fetch(`${BACKEND_URL}/api/locations`, { cache: "no-store" }),
   ]);
 
   if (!adRes.ok) {
@@ -26,13 +27,15 @@ const BACKEND_URL = process.env.BACKEND_API_URL || "http://localhost:5000";
 
   const { ad } = await adRes.json();
   const categoriesData = await categoriesRes.json().catch(() => ({ categories: [] }));
+  const locationsData = await locationsRes.json().catch(() => ({ countries: [] }));
   const categories = categoriesData.categories || [];
+  const locations = locationsData.countries || [];
 
   if (!ad) {
     notFound();
   }
 
-  if (ad.userId !== session.id && session.role !== "ADMIN") {
+  if ((ad.userId || ad.user?.id) !== session.id && session.role !== "ADMIN") {
     redirect("/dashboard");
   }
 
@@ -45,9 +48,7 @@ const BACKEND_URL = process.env.BACKEND_API_URL || "http://localhost:5000";
         </p>
       </div>
 
-      <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-        <EditAdForm ad={ad} categories={categories} />
-      </div>
+      <EditAdForm ad={ad} categories={categories} locations={locations} />
     </div>
   );
 }

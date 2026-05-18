@@ -280,7 +280,7 @@ function SellerCard({
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold">
+        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-rose-600 flex items-center justify-center text-white font-bold">
           {user.name.charAt(0).toUpperCase()}
         </div>
         <div>

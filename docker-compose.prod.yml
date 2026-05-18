@@ -69,6 +69,24 @@ services:
       - backend
     restart: unless-stopped
 
+  # ── Admin Panel (Next.js SPA) ─────────────────────────────────────────────────
+  admin-panel:
+    ports:
+      - "3056:3000"
+    build:
+      context: ./admin-panel
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_APP_URL}
+    container_name: classified-admin
+    environment:
+      NODE_ENV: production
+    networks:
+      - classified-net
+    depends_on:
+      - backend
+    restart: unless-stopped
+
   # ── Nginx (reverse proxy) ─────────────────────────────────────────────────────
   nginx:
     image: nginx:1.27-alpine
@@ -85,6 +103,7 @@ services:
     depends_on:
       - frontend
       - backend
+      - admin-panel
     restart: unless-stopped
 
 networks:

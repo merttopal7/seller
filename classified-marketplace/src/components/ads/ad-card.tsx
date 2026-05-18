@@ -48,15 +48,20 @@ export function AdCard({
       : `https://picsum.photos/seed/${ad.id}/400/300`;
 
   return (
-    <Link href={`/ads/${ad.id}`} className="group block">
-      <div className="rounded-xl border border-border bg-card overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+    <Link href={`/ads/${ad.id}`} className="group flex flex-col h-full">
+      <div className={cn(
+        "flex flex-col h-full rounded-xl border bg-card overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5",
+        ad.isFeatured
+          ? "border-amber-500/30 dark:border-amber-500/40 shadow-[0_0_15px_-3px_rgba(245,158,11,0.05)] dark:shadow-[0_0_20px_-3px_rgba(245,158,11,0.1)]"
+          : "border-border"
+      )}>
         {/* Image */}
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
           <Image
             src={imageUrl}
             alt={ad.title}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            className="object-contain group-hover:scale-105 transition-transform duration-500"
             onError={() => setImgError(true)}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />
@@ -83,23 +88,25 @@ export function AdCard({
         </div>
 
         {/* Content */}
-        <div className="p-3">
-          <div className="flex items-start justify-between gap-2 mb-1.5">
-            <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">
-              {ad.title}
-            </h3>
+        <div className="flex-1 flex flex-col justify-between p-3">
+          <div>
+            <div className="flex items-start justify-between gap-2 mb-1.5">
+              <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+                {ad.title}
+              </h3>
+            </div>
+
+            <p className="text-lg font-bold text-primary mb-2">
+              {formatPrice(ad.price, ad.currency)}
+            </p>
+
+            <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+              <MapPin className="h-3 w-3 shrink-0" />
+              <span className="truncate">{ad.city}</span>
+            </div>
           </div>
 
-          <p className="text-lg font-bold text-primary mb-2">
-            {formatPrice(ad.price, ad.currency)}
-          </p>
-
-          <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
-            <MapPin className="h-3 w-3 shrink-0" />
-            <span className="truncate">{ad.city}</span>
-          </div>
-
-          <div className="flex items-center justify-between mt-2">
+          <div className="flex items-center justify-between mt-3 pt-2 border-t border-border/40">
             <Badge variant="secondary" className="text-xs">
               {ad.category.name}
             </Badge>

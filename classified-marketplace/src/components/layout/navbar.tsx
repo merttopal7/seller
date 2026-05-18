@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ModeToggle } from "@/components/mode-toggle";
 
 interface NavUser {
   id: string;
@@ -57,10 +58,10 @@ export function Navbar({ user }: NavbarProps) {
         <div className="flex h-16 items-center gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-rose-600 flex items-center justify-center">
               <span className="text-white font-bold text-sm">M</span>
             </div>
-            <span className="font-bold text-xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent hidden sm:block">
+            <span className="font-bold text-xl bg-gradient-to-r from-primary to-rose-600 bg-clip-text text-transparent hidden sm:block">
               MarketPlace
             </span>
           </Link>
@@ -109,7 +110,7 @@ export function Navbar({ user }: NavbarProps) {
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     className="flex items-center gap-2 rounded-full hover:bg-muted px-3 py-1.5 transition-colors"
                   >
-                    <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white text-xs font-bold">
+                    <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary to-rose-600 flex items-center justify-center text-white text-xs font-bold">
                       {user.name.charAt(0).toUpperCase()}
                     </div>
                     <span className="text-sm font-medium max-w-[100px] truncate">{user.name}</span>
@@ -171,6 +172,8 @@ export function Navbar({ user }: NavbarProps) {
                 </Link>
               </>
             )}
+            <div className="border-l border-border h-5 mx-1" />
+            <ModeToggle />
           </nav>
 
           {/* Mobile menu toggle */}
@@ -204,26 +207,29 @@ export function Navbar({ user }: NavbarProps) {
                 className="flex items-center gap-2"
                 onClick={() => setMobileOpen(false)}
               >
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center">
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-rose-600 flex items-center justify-center">
                   <span className="text-white font-bold text-sm">M</span>
                 </div>
-                <span className="font-bold text-lg bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                <span className="font-bold text-lg bg-gradient-to-r from-primary to-rose-600 bg-clip-text text-transparent">
                   MarketPlace
                 </span>
               </Link>
-              <button
-                onClick={() => setMobileOpen(false)}
-                className="p-1.5 rounded-lg hover:bg-muted transition-colors"
-                aria-label="Close menu"
-              >
-                <X className="h-5 w-5" />
-              </button>
+              <div className="flex items-center gap-1">
+                <ModeToggle />
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+                  aria-label="Close menu"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
             </div>
 
             {/* User info */}
             {user && (
               <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-muted/30">
-                <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
+                <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-rose-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
                   {user.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0">

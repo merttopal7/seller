@@ -9,6 +9,7 @@ import { CategoryIcon } from "@/components/ui/category-icon";
 import { LocationFilters } from "@/components/ads/location-filters";
 import { MobileFilterToggle } from "@/components/ads/mobile-filter-toggle";
 import { SortSelect } from "@/components/ads/sort-select";
+import { LimitSelect } from "@/components/ads/limit-select";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ interface SearchParams {
   maxPrice?: string;
   sort?: string;
   page?: string;
+  limit?: string;
   featured?: string;
   [key: string]: string | undefined;
 }
@@ -64,6 +66,7 @@ async function getListings(params: SearchParams) {
   const maxPrice = params.maxPrice || "";
   const sort = params.sort || "newest";
   const page = params.page || "1";
+  const limitNum = Math.min(100, Math.max(1, Number(params.limit) || 10));
 
   const hasAnyFilter =
     q || categorySlug || country || state || city || location || minPrice || maxPrice ||
@@ -80,7 +83,7 @@ async function getListings(params: SearchParams) {
     maxPrice,
     sort,
     page,
-    limit: "12",
+    limit: String(limitNum),
     ...(!hasAnyFilter ? { featured: "true" } : {}),
   });
 
@@ -115,7 +118,7 @@ async function getListings(params: SearchParams) {
       selectedCatFilters,
       locations: locationsData.countries || [],
       page: Number(page),
-      limit: 12,
+      limit: limitNum,
       totalPages: adsData.pagination?.totalPages || 1,
     };
   } catch (error) {
@@ -128,7 +131,7 @@ async function getListings(params: SearchParams) {
       selectedCatFilters: null,
       locations: [],
       page: 1,
-      limit: 12,
+      limit: limitNum,
       totalPages: 1,
     };
   }
@@ -514,38 +517,47 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
             </div>
           )}
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-8">
-              <Link href={buildUrl({ page: String(page - 1) })}>
-                <Button variant="outline" size="icon" disabled={page <= 1}>
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-              </Link>
+          {/* Pagination + Limit */}
+          {(totalPages > 1 || total > 0) && (
+            <div className="flex items-center justify-between gap-4 mt-8">
+              <LimitSelect
+                current={limit}
+                options={[10, 25, 50, 100].map((n) => ({
+                  value: n,
+                  href: buildUrl({ limit: String(n), page: "1" }),
+                }))}
+              />
 
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                const pageNum = Math.min(
-                  Math.max(page - 2, 1) + i,
-                  totalPages
-                );
-                return (
-                  <Link key={pageNum} href={buildUrl({ page: String(pageNum) })}>
-                    <Button
-                      variant={pageNum === page ? "default" : "outline"}
-                      size="icon"
-                      className="h-9 w-9"
-                    >
-                      {pageNum}
+              {totalPages > 1 && (
+                <div className="flex items-center gap-2">
+                  <Link href={buildUrl({ page: String(page - 1) })}>
+                    <Button variant="outline" size="icon" disabled={page <= 1}>
+                      <ChevronLeft className="h-4 w-4" />
                     </Button>
                   </Link>
-                );
-              })}
 
-              <Link href={buildUrl({ page: String(page + 1) })}>
-                <Button variant="outline" size="icon" disabled={page >= totalPages}>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </Link>
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    const pageNum = Math.min(Math.max(page - 2, 1) + i, totalPages);
+                    return (
+                      <Link key={pageNum} href={buildUrl({ page: String(pageNum) })}>
+                        <Button
+                          variant={pageNum === page ? "default" : "outline"}
+                          size="icon"
+                          className="h-9 w-9"
+                        >
+                          {pageNum}
+                        </Button>
+                      </Link>
+                    );
+                  })}
+
+                  <Link href={buildUrl({ page: String(page + 1) })}>
+                    <Button variant="outline" size="icon" disabled={page >= totalPages}>
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           )}
         </div>
