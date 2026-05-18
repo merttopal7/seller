@@ -157,9 +157,10 @@ export function EditAdForm({ ad, categories, locations }: { ad: AdWithImages; ca
   }
 
   // 3. If not found by city, try by state
-  if (!foundCityObj && ad.state) {
+  const adState = ad.state;
+  if (!foundCityObj && adState) {
     for (const c of locations) {
-      const s = c.states?.find((s: any) => s.name.toLowerCase() === ad.state.toLowerCase());
+      const s = c.states?.find((s: any) => s.name.toLowerCase() === adState.toLowerCase());
       if (s) {
         foundCountryObj = c;
         foundStateObj = s;
