@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
 import { requireAdmin } from "../middleware/auth.js";
-import { reindexAll } from "../lib/search-service.js";
+import { reindexAll, indexAd, deleteAdFromIndex } from "../lib/search-service.js";
 
 const router = Router();
 
@@ -116,6 +116,9 @@ router.patch("/ads/:id", async (req, res) => {
       data: { status },
     });
 
+    // Re-index in Elasticsearch to reflect the approved/rejected status
+    indexAd(id).catch(console.error);
+
     return res.json({ ad });
   } catch (error) {
     console.error("Admin edit ad error:", error);
@@ -131,6 +134,9 @@ router.delete("/ads/:id", async (req, res) => {
     await prisma.favorite.deleteMany({ where: { adId: id } });
     await prisma.image.deleteMany({ where: { adId: id } });
     await prisma.ad.delete({ where: { id } });
+
+    // Delete from Elasticsearch index
+    deleteAdFromIndex(id).catch(console.error);
 
     return res.json({ success: true });
   } catch (error) {
